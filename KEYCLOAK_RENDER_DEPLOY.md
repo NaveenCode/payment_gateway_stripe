@@ -35,19 +35,34 @@ Keycloak needs a database to store users and settings.
 ### Step 3: Deploy Keycloak Web Service
 
 1. Click **"New +"** → **"Web Service"**
-2. Click **"Deploy an existing image from a registry"**
-3. Configure the service:
+2. You'll see three tabs: **"Git Provider"**, **"Public Git Repository"**, and **"Existing Image"**
+3. Click the **"Existing Image"** tab (should be highlighted in purple)
+4. Fill in the form:
 
-#### Basic Settings:
-- **Name:** `keycloak-auth`
-- **Region:** Same as your database
-- **Image URL:** `quay.io/keycloak/keycloak:latest`
+#### Source Code Section:
+- **Image URL:** Replace the default with:
+  ```
+  quay.io/keycloak/keycloak:latest
+  ```
+- **Credential:** Leave as "No credential"
+
+5. Scroll down to the **Name** field:
+   - **Name:** `keycloak-auth`
+   - The URL will auto-generate (like `keycloak-auth.onrender.com`)
+
+6. Click **"Connect"** or **"Next"** button (on the right side)
+
+7. On the next page:
 
 #### Instance Type:
-- Select **Free** (512 MB RAM)
+- Select **"Free"** (512 MB RAM, $0/month)
+
+#### Region:
+- Choose the same region as your PostgreSQL database (or closest to you)
 
 #### Environment Variables:
-Click **"Add Environment Variable"** and add these:
+Scroll down and you'll see an **"Environment Variables"** section.
+Click **"Add Environment Variable"** button and add these one by one:
 
 ```
 KC_DB=postgres
