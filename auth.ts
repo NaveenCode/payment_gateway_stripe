@@ -30,21 +30,22 @@ export const authOptions: NextAuthOptions = {
   // ========== Providers ==========
   providers: [
     // ===== Keycloak SSO Provider (Primary) =====
-    KeycloakProvider({
-      clientId: process.env.KEYCLOAK_CLIENT_ID!,
-      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
-      issuer: process.env.KEYCLOAK_ISSUER!,
+    // TEMPORARILY DISABLED - Uncomment when Keycloak is deployed
+    // KeycloakProvider({
+    //   clientId: process.env.KEYCLOAK_CLIENT_ID!,
+    //   clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
+    //   issuer: process.env.KEYCLOAK_ISSUER!,
 
-      // Additional Keycloak configuration
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name ?? profile.preferred_username,
-          email: profile.email,
-          image: profile.picture,
-        };
-      },
-    }),
+    //   // Additional Keycloak configuration
+    //   profile(profile) {
+    //     return {
+    //       id: profile.sub,
+    //       name: profile.name ?? profile.preferred_username,
+    //       email: profile.email,
+    //       image: profile.picture,
+    //     };
+    //   },
+    // }),
 
     // ===== Credentials Provider (Fallback) =====
     CredentialsProvider({

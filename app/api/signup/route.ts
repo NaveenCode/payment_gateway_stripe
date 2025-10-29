@@ -42,26 +42,28 @@ export async function POST(request: Request) {
     }
 
     // ========== Step 3: Check Keycloak for Existing User ==========
-    const existsInKeycloak = await keycloakUserExists(email);
-    if (existsInKeycloak) {
-      return NextResponse.json(
-        { error: "Email already registered in Keycloak" },
-        { status: 400 }
-      );
-    }
+    // TEMPORARILY DISABLED - Uncomment when Keycloak is deployed
+    // const existsInKeycloak = await keycloakUserExists(email);
+    // if (existsInKeycloak) {
+    //   return NextResponse.json(
+    //     { error: "Email already registered in Keycloak" },
+    //     { status: 400 }
+    //   );
+    // }
 
     // ========== Step 4: Create User in Keycloak FIRST ==========
-    console.log("🔐 Creating user in Keycloak...");
-    try {
-      keycloakUserId = await createKeycloakUser(name, email, password);
-      console.log(`✅ Keycloak user created with ID: ${keycloakUserId}`);
-    } catch (keycloakError: any) {
-      console.error("❌ Keycloak user creation failed:", keycloakError.message);
-      return NextResponse.json(
-        { error: `Keycloak error: ${keycloakError.message}` },
-        { status: 500 }
-      );
-    }
+    // TEMPORARILY DISABLED - Uncomment when Keycloak is deployed
+    // console.log("🔐 Creating user in Keycloak...");
+    // try {
+    //   keycloakUserId = await createKeycloakUser(name, email, password);
+    //   console.log(`✅ Keycloak user created with ID: ${keycloakUserId}`);
+    // } catch (keycloakError: any) {
+    //   console.error("❌ Keycloak user creation failed:", keycloakError.message);
+    //   return NextResponse.json(
+    //     { error: `Keycloak error: ${keycloakError.message}` },
+    //     { status: 500 }
+    //   );
+    // }
 
     // ========== Step 5: Create User in MongoDB ==========
     console.log("💾 Creating user in MongoDB...");
@@ -70,12 +72,11 @@ export async function POST(request: Request) {
       console.log(`✅ MongoDB user created: ${user.email}`);
 
       return NextResponse.json({
-        message: "User created successfully in both Keycloak and database",
+        message: "User created successfully in database",
         user: {
           id: user.id,
           name: user.name,
           email: user.email,
-          keycloakId: keycloakUserId,
         },
       });
     } catch (dbError: any) {

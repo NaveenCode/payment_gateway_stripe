@@ -76,8 +76,9 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Keycloak SSO Login Button */}
-        <button
+        {/* Keycloak SSO Login Button - TEMPORARILY DISABLED */}
+        {/* Uncomment when Keycloak is deployed */}
+        {/* <button
           onClick={handleKeycloakLogin}
           disabled={isKeycloakLoading || isLoading}
           className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md"
@@ -122,14 +123,14 @@ export default function LoginPage() {
         </button>
 
         {/* Divider */}
-        <div className="relative">
+        {/* <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-2 bg-white text-gray-500">Or continue with email</span>
           </div>
-        </div>
+        </div> */}
 
         {/* Credentials Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
