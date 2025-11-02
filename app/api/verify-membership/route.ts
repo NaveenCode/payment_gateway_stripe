@@ -66,13 +66,17 @@ export async function GET(request: Request) {
     let subscription = null;
     let currentPeriodEnd = new Date();
     currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1);
+    let currentPeriodStart = new Date();
 
     if (subscriptionId) {
       subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      currentPeriodStart = new Date(subscription.current_period_start * 1000);
       currentPeriodEnd = new Date(subscription.current_period_end * 1000);
     }
 
     const currentDate = new Date();
+    const membershipStartDate = currentPeriodStart;
+    const membershipEndDate = currentPeriodEnd;
 
     user.membershipDetails = {
       ...user.membershipDetails,
@@ -83,6 +87,8 @@ export async function GET(request: Request) {
       paymentIntentId: paymentIntent.id,
       subscriptionId: subscriptionId || undefined,
       subscriptionStatus: subscription?.status || "active",
+      membershipStartDate: membershipStartDate,
+      membershipEndDate: membershipEndDate,
       currentPeriodEnd: currentPeriodEnd,
       hasMembership: true,
       invoiceId: invoiceId || undefined,

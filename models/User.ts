@@ -28,6 +28,8 @@ export interface IMembershipDetails {
     | "past_due"
     | "trialing"
     | "unpaid";
+  membershipStartDate?: Date;
+  membershipEndDate?: Date;
   currentPeriodEnd?: Date;
   hasMembership?: boolean;
 }
@@ -126,6 +128,14 @@ const MembershipDetailsSchema = new Schema<IMembershipDetails>(
         "unpaid",
         null,
       ],
+      default: null,
+    },
+    membershipStartDate: {
+      type: Date,
+      default: null,
+    },
+    membershipEndDate: {
+      type: Date,
       default: null,
     },
     currentPeriodEnd: {
