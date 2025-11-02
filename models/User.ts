@@ -21,7 +21,13 @@ export interface IMembershipDetails {
   invoiceId?: string;
   receiptUrl?: string;
   subscriptionId?: string;
-  subscriptionStatus?: "active" | "canceled" | "incomplete" | "past_due" | "trialing" | "unpaid";
+  subscriptionStatus?:
+    | "active"
+    | "canceled"
+    | "incomplete"
+    | "past_due"
+    | "trialing"
+    | "unpaid";
   currentPeriodEnd?: Date;
   hasMembership?: boolean;
 }
@@ -31,7 +37,7 @@ export interface IUser {
   email: string;
   password: string;
   membershipDetails?: IMembershipDetails;
-  savedPaymentMethods?: ISavedPaymentMethod[]; // Array of saved cards
+  savedPaymentMethods?: ISavedPaymentMethod[];
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -111,7 +117,15 @@ const MembershipDetailsSchema = new Schema<IMembershipDetails>(
     },
     subscriptionStatus: {
       type: String,
-      enum: ["active", "canceled", "incomplete", "past_due", "trialing", "unpaid", null],
+      enum: [
+        "active",
+        "canceled",
+        "incomplete",
+        "past_due",
+        "trialing",
+        "unpaid",
+        null,
+      ],
       default: null,
     },
     currentPeriodEnd: {
@@ -165,7 +179,7 @@ const UserSchema = new Schema<IUser>(
     },
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 

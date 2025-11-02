@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { findUserByEmail } from "@/lib/users";
+import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -34,7 +35,12 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          if (dbUser.password !== credentials.password) {
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            dbUser.password
+          );
+
+          if (!isPasswordValid) {
             console.log("❌ Invalid password for:", credentials.email);
             return null;
           }

@@ -1,6 +1,7 @@
 // MongoDB user operations
 import connectDB from "./mongodb";
 import User from "@/models/User";
+import bcrypt from "bcryptjs";
 
 export interface UserData {
   id: string;
@@ -15,10 +16,12 @@ export async function addUser(
   email: string,
   password: string
 ): Promise<UserData> {
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   const newUser = await User.create({
     name,
     email,
-    password, // WARNING: In production, hash passwords with bcrypt!
+    password: hashedPassword,
   });
 
   return {
