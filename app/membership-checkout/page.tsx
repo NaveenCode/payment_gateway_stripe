@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import MembershipCheckoutForm from "@/components/MembershipCheckoutForm";
@@ -52,7 +53,8 @@ const membershipPlans: MembershipPlan[] = [
 export default function MembershipCheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const userEmail = searchParams.get("email");
+  const { data: session, status } = useSession();
+  const emailFromUrl = searchParams.get("email");
   const errorType = searchParams.get("error");
   const [selectedPlan, setSelectedPlan] = useState<MembershipPlan>(
     membershipPlans[1]
@@ -61,9 +63,19 @@ export default function MembershipCheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Determine user email: from session (logged in) or URL (new signup)
+  const userEmail = session?.user?.email || emailFromUrl;
+
   useEffect(() => {
-    if (!userEmail) {
+    // If loading session, wait
+    if (status === "loading") {
+      return;
+    }
+
+    // If no session and no email from URL, redirect to signup
+    if (!session && !emailFromUrl) {
       router.push("/signup");
+      return;
     }
 
     // Set error message based on error type from URL
@@ -74,7 +86,7 @@ export default function MembershipCheckoutPage() {
     } else if (errorType === "invalid_dates") {
       setError("Your membership dates are invalid. Please purchase a new membership.");
     }
-  }, [userEmail, errorType, router]);
+  }, [session, emailFromUrl, errorType, status, router]);
 
   const handlePlanSelect = (plan: MembershipPlan) => {
     setSelectedPlan(plan);
@@ -113,10 +125,10 @@ export default function MembershipCheckoutPage() {
     }
   };
 
-  if (!userEmail) {
+  if (status === "loading" || !userEmail) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="text-xl text-gray-700">Redirecting...</div>
+        <div className="text-xl text-gray-700">Loading...</div>
       </div>
     );
   }
@@ -126,10 +138,12 @@ export default function MembershipCheckoutPage() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Choose Your Membership
+            {errorType ? "Renew Your Membership" : "Choose Your Membership"}
           </h1>
           <p className="text-lg text-gray-600">
-            Select a plan and complete your yearly membership to access the dashboard
+            {errorType
+              ? "Your membership needs to be renewed. Select a plan to continue."
+              : "Select a plan and complete your yearly membership to access the dashboard"}
           </p>
         </div>
 
