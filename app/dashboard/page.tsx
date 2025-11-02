@@ -26,6 +26,30 @@ export default async function DashboardPage() {
     redirect("/membership-checkout");
   }
 
+  // Check if membership dates are valid
+  const currentDate = new Date();
+  const membershipStart = user.membershipDetails?.membershipStartDate
+    ? new Date(user.membershipDetails.membershipStartDate)
+    : null;
+  const membershipEnd = user.membershipDetails?.membershipEndDate
+    ? new Date(user.membershipDetails.membershipEndDate)
+    : null;
+
+  // Validate: current date must be >= start date AND <= end date
+  if (membershipStart && membershipEnd) {
+    if (currentDate < membershipStart) {
+      // Membership hasn't started yet
+      redirect("/membership-checkout?error=not_started");
+    }
+    if (currentDate > membershipEnd) {
+      // Membership has expired
+      redirect("/membership-checkout?error=expired");
+    }
+  } else if (!membershipStart || !membershipEnd) {
+    // Missing membership dates - treat as no valid membership
+    redirect("/membership-checkout?error=invalid_dates");
+  }
+
   return (
     <div className="min-h-screen p-8 bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-4xl mx-auto">

@@ -53,6 +53,7 @@ export default function MembershipCheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const userEmail = searchParams.get("email");
+  const errorType = searchParams.get("error");
   const [selectedPlan, setSelectedPlan] = useState<MembershipPlan>(
     membershipPlans[1]
   );
@@ -64,7 +65,16 @@ export default function MembershipCheckoutPage() {
     if (!userEmail) {
       router.push("/signup");
     }
-  }, [userEmail, router]);
+
+    // Set error message based on error type from URL
+    if (errorType === "expired") {
+      setError("Your membership has expired. Please renew to continue.");
+    } else if (errorType === "not_started") {
+      setError("Your membership hasn't started yet. Please contact support.");
+    } else if (errorType === "invalid_dates") {
+      setError("Your membership dates are invalid. Please purchase a new membership.");
+    }
+  }, [userEmail, errorType, router]);
 
   const handlePlanSelect = (plan: MembershipPlan) => {
     setSelectedPlan(plan);
