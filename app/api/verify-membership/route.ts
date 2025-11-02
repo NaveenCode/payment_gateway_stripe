@@ -57,7 +57,7 @@ export async function GET(request: Request) {
     let receiptUrl = null;
 
     if (invoices.data.length > 0) {
-      const invoice = invoices.data[0];
+      const invoice: any = invoices.data[0];
       subscriptionId = invoice.subscription as string;
       invoiceId = invoice.id;
       receiptUrl = invoice.hosted_invoice_url;
