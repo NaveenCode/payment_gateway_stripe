@@ -19,7 +19,8 @@ export async function GET(request: Request) {
       );
     }
 
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    const paymentIntent: any =
+      await stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status !== "succeeded") {
       return NextResponse.json(
@@ -92,7 +93,8 @@ export async function GET(request: Request) {
       currentPeriodEnd: currentPeriodEnd,
       hasMembership: true,
       invoiceId: invoiceId || undefined,
-      receiptUrl: receiptUrl || paymentIntent.charges?.data[0]?.receipt_url || undefined,
+      receiptUrl:
+        receiptUrl || paymentIntent.charges?.data[0]?.receipt_url || undefined,
     };
 
     await user.save();
