@@ -54,20 +54,17 @@ export default withAuth(
 export const config = {
   matcher: [
     /*
-     * Match all request paths except:
-     * - / (home page - root path)
-     * - /login
-     * - /signup (signup page)
-     * - /api/auth/* (NextAuth API routes)
-     * - /api/signup (signup API route)
-     * - /api/membership-subscription (membership API)
-     * - /api/verify-membership (membership verification)
-     * - /membership-checkout (membership page)
-     * - /membership-success (membership success page)
-     * - /_next/* (Next.js static files)
-     * - /favicon.ico
-     * - Files with extensions (images, etc.)
+     * Protect only specific routes that require authentication:
+     * - /dashboard (requires login AND active membership)
+     * - /resend
+     * - /success
+     * - /cancel
+     *
+     * All other routes are public by default
      */
-    "/((?!$|api/auth|api/signup|api/membership-subscription|api/verify-membership|_next|favicon.ico|.*\\..*|login|signup|membership-checkout|membership-success).*)",
+    "/dashboard/:path*",
+    "/resend/:path*",
+    "/success/:path*",
+    "/cancel/:path*",
   ],
 };
