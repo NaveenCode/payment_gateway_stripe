@@ -4,8 +4,9 @@ import connectDB from "@/lib/mongodb";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json();
-
+    const body = await request.json();
+    console.log("body", body);
+    const { name, email, password } = body;
     console.log("📝 Signup attempt:", { name, email });
 
     if (!name || !email || !password) {

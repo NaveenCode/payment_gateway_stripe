@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import MembershipCheckoutForm from "@/components/MembershipCheckoutForm";
@@ -52,7 +51,8 @@ const membershipPlans: MembershipPlan[] = [
 
 export default function MembershipCheckoutPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const userEmail = searchParams.get("email");
   const [selectedPlan, setSelectedPlan] = useState<MembershipPlan>(
     membershipPlans[1]
   );
@@ -61,10 +61,10 @@ export default function MembershipCheckoutPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
+    if (!userEmail) {
+      router.push("/signup");
     }
-  }, [status, router]);
+  }, [userEmail, router]);
 
   const handlePlanSelect = (plan: MembershipPlan) => {
     setSelectedPlan(plan);
@@ -82,6 +82,7 @@ export default function MembershipCheckoutPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          email: userEmail,
           membershipType: selectedPlan.id,
           price: selectedPlan.price,
           currency: selectedPlan.currency,
@@ -102,16 +103,12 @@ export default function MembershipCheckoutPage() {
     }
   };
 
-  if (status === "loading") {
+  if (!userEmail) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="text-xl text-gray-700">Loading...</div>
+        <div className="text-xl text-gray-700">Redirecting...</div>
       </div>
     );
-  }
-
-  if (!session) {
-    return null;
   }
 
   return (

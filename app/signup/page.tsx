@@ -43,10 +43,10 @@ export default function SignupPage() {
       return;
     }
 
-    // Success! Redirect to membership checkout
+    // Success! Redirect to membership checkout with email
     setSuccess(true);
     setTimeout(() => {
-      router.push("/membership-checkout");
+      router.push(`/membership-checkout?email=${encodeURIComponent(email)}`);
     }, 2000);
   }
 
