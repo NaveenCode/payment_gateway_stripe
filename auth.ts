@@ -1,8 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
-import KeycloakProvider from "next-auth/providers/keycloak";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { findUserByEmail } from "@/lib/users";
-import { getKeycloakUserByEmail } from "@/lib/keycloak-admin";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -41,21 +39,6 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          console.log("🔍 Checking if user exists in Keycloak...");
-          const keycloakUser = await getKeycloakUserByEmail(credentials.email);
-
-          if (!keycloakUser) {
-            console.log(
-              "⚠️ User exists in MongoDB but not in Keycloak:",
-              credentials.email
-            );
-            console.log(
-              "💡 User can still login with credentials, but SSO won't work"
-            );
-          } else {
-            console.log("✅ User verified in both MongoDB and Keycloak");
-          }
-
           console.log("✅ Credentials login successful:", dbUser.email);
           return {
             id: dbUser.id,
@@ -76,69 +59,13 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === "keycloak") {
-        console.log("🔐 Keycloak SSO login attempt for:", user.email);
-
-        try {
-          const dbUser = await findUserByEmail(user.email || "");
-
-          if (!dbUser) {
-            console.log("❌ SSO user not found in MongoDB:", user.email);
-            console.log("💡 User must sign up first before using SSO login");
-            return false;
-          }
-
-          console.log("✅ SSO user verified in MongoDB:", user.email);
-          user.id = dbUser.id;
-
-          return true;
-        } catch (error) {
-          console.error("❌ Error checking SSO user in database:", error);
-          return false;
-        }
-      }
-
-      return true;
-    },
-
-    async jwt({ token, user, account }) {
-      const now = Math.floor(Date.now() / 1000);
-
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
-        token.provider = account?.provider || "credentials";
 
-        if (account?.provider === "keycloak") {
-          token.accessToken = account.access_token;
-          token.refreshToken = account.refresh_token;
-          token.idToken = account.id_token;
-          console.log("✅ Keycloak JWT created for user:", user.email);
-          console.log("🔑 Access token stored");
-        } else {
-          token.originalExp = now + 60 * 20;
-          console.log("✅ Credentials JWT created for user:", user.email);
-        }
-
-        console.log(
-          "⏰ Login time:",
-          new Date(now * 1000).toLocaleTimeString()
-        );
-      }
-
-      if (token.originalExp && typeof token.originalExp === "number") {
-        if (now >= token.originalExp) {
-          console.log(
-            "❌ JWT expired! Original exp:",
-            token.originalExp,
-            "Now:",
-            now
-          );
-          console.log("🔄 Provider:", token.provider);
-          return null as any;
-        }
+        console.log("✅ JWT created for user:", user.email);
       }
 
       return token;
