@@ -30,7 +30,11 @@ export default function MembershipSuccessPage() {
 
         if (response.ok && data.success) {
           setStatus("success");
-          setMessage("Your membership is now active!");
+          setMessage("Your membership is now active! Redirecting to login...");
+
+          setTimeout(() => {
+            router.push("/login");
+          }, 2000);
         } else {
           setStatus("error");
           setMessage(data.error || "Payment verification failed");
@@ -42,7 +46,7 @@ export default function MembershipSuccessPage() {
     };
 
     verifyPayment();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">

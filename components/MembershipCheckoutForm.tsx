@@ -38,7 +38,7 @@ export default function MembershipCheckoutForm({
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/membership-success`,
+        return_url: `${window.location.origin}/membership-success?redirect=login`,
       },
     });
 
