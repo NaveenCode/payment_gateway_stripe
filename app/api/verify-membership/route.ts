@@ -63,7 +63,7 @@ export async function GET(request: Request) {
       receiptUrl = invoice.hosted_invoice_url;
     }
 
-    let subscription = null;
+    let subscription: any = null;
     let currentPeriodEnd = new Date();
     currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1);
     let currentPeriodStart = new Date();
@@ -80,13 +80,13 @@ export async function GET(request: Request) {
 
     user.membershipDetails = {
       ...user.membershipDetails,
-      membershipType: membershipType || "external",
+      membershipType: (membershipType || "external") as "internal" | "external",
       price: paymentIntent.amount / 100,
       currency: paymentIntent.currency,
       lastPaymentDate: currentDate,
       paymentIntentId: paymentIntent.id,
       subscriptionId: subscriptionId || undefined,
-      subscriptionStatus: subscription?.status || "active",
+      subscriptionStatus: (subscription?.status || "active") as any,
       membershipStartDate: membershipStartDate,
       membershipEndDate: membershipEndDate,
       currentPeriodEnd: currentPeriodEnd,
