@@ -46,9 +46,33 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const invoices = await stripe.invoices.list({
+      customer: user.membershipDetails?.customerId,
+      limit: 1,
+      status: "paid",
+    });
+
+    let subscriptionId = null;
+    let invoiceId = null;
+    let receiptUrl = null;
+
+    if (invoices.data.length > 0) {
+      const invoice = invoices.data[0];
+      subscriptionId = invoice.subscription as string;
+      invoiceId = invoice.id;
+      receiptUrl = invoice.hosted_invoice_url;
+    }
+
+    let subscription = null;
+    let currentPeriodEnd = new Date();
+    currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1);
+
+    if (subscriptionId) {
+      subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      currentPeriodEnd = new Date(subscription.current_period_end * 1000);
+    }
+
     const currentDate = new Date();
-    const oneYearLater = new Date();
-    oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
 
     user.membershipDetails = {
       ...user.membershipDetails,
@@ -57,10 +81,12 @@ export async function GET(request: Request) {
       currency: paymentIntent.currency,
       lastPaymentDate: currentDate,
       paymentIntentId: paymentIntent.id,
-      subscriptionStatus: "active",
-      currentPeriodEnd: oneYearLater,
+      subscriptionId: subscriptionId || undefined,
+      subscriptionStatus: subscription?.status || "active",
+      currentPeriodEnd: currentPeriodEnd,
       hasMembership: true,
-      receiptUrl: paymentIntent.charges?.data[0]?.receipt_url || null,
+      invoiceId: invoiceId || undefined,
+      receiptUrl: receiptUrl || paymentIntent.charges?.data[0]?.receipt_url || undefined,
     };
 
     await user.save();
