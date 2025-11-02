@@ -43,10 +43,10 @@ export default function SignupPage() {
       return;
     }
 
-    // Success!
+    // Success! Redirect to membership checkout
     setSuccess(true);
     setTimeout(() => {
-      router.push("/login");
+      router.push("/membership-checkout");
     }, 2000);
   }
 
@@ -63,7 +63,7 @@ export default function SignupPage() {
 
         {success && (
           <div className="p-3 text-sm text-green-600 bg-green-50 rounded-lg border border-green-200">
-            Account created! Redirecting to login...
+            Account created! Redirecting to membership checkout...
           </div>
         )}
 

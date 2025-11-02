@@ -12,14 +12,18 @@ export interface ISavedPaymentMethod {
 }
 
 export interface IMembershipDetails {
-  customerId?: string; // Stripe customer ID
+  customerId?: string;
   membershipType: "internal" | "external";
   price?: number;
   currency?: string;
   lastPaymentDate?: Date;
   paymentIntentId?: string;
-  invoiceId?: string; // Stripe invoice ID
-  receiptUrl?: string; // Stripe receipt URL
+  invoiceId?: string;
+  receiptUrl?: string;
+  subscriptionId?: string;
+  subscriptionStatus?: "active" | "canceled" | "incomplete" | "past_due" | "trialing" | "unpaid";
+  currentPeriodEnd?: Date;
+  hasMembership: boolean;
 }
 
 export interface IUser {
@@ -102,6 +106,23 @@ const MembershipDetailsSchema = new Schema<IMembershipDetails>(
       type: String,
       default: null,
     },
+    subscriptionId: {
+      type: String,
+      default: null,
+    },
+    subscriptionStatus: {
+      type: String,
+      enum: ["active", "canceled", "incomplete", "past_due", "trialing", "unpaid"],
+      default: null,
+    },
+    currentPeriodEnd: {
+      type: Date,
+      default: null,
+    },
+    hasMembership: {
+      type: Boolean,
+      default: false,
+    },
   },
   { _id: false }
 );
@@ -133,6 +154,10 @@ const UserSchema = new Schema<IUser>(
         currency: null,
         lastPaymentDate: null,
         paymentIntentId: null,
+        subscriptionId: null,
+        subscriptionStatus: null,
+        currentPeriodEnd: null,
+        hasMembership: false,
       }),
     },
     savedPaymentMethods: {

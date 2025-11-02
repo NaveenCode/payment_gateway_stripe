@@ -5,14 +5,25 @@ import LogoutButton from "@/components/LogoutButton";
 import SessionTimer from "@/components/SessionTimer";
 import UserProfile from "@/components/dashboard/UserProfile";
 import Link from "next/link";
+import connectDB from "@/lib/mongodb";
+import User from "@/models/User";
 
 export default async function DashboardPage() {
-  // Check if user is logged in
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    // Not logged in? Send to login page
     redirect("/login");
+  }
+
+  await connectDB();
+  const user = await User.findOne({ email: session.user?.email });
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  if (!user.membershipDetails?.hasMembership) {
+    redirect("/membership-checkout");
   }
 
   return (
