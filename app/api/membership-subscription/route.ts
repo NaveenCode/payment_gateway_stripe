@@ -126,7 +126,10 @@ export async function POST(request: Request) {
       customer: customerId,
       items: [{ price: priceObj.id }],
       payment_behavior: "default_incomplete",
-      payment_settings: { save_default_payment_method: "on_subscription" },
+      payment_settings: {
+        save_default_payment_method: "on_subscription",
+        payment_method_types: ["card"],
+      },
       expand: ["latest_invoice.payment_intent"],
       metadata: {
         userId: user._id.toString(),
@@ -136,12 +139,23 @@ export async function POST(request: Request) {
 
     const latestInvoice = subscription.latest_invoice;
     let clientSecret: string | null = null;
+    let paymentIntentId: string | null = null;
 
     if (latestInvoice && typeof latestInvoice === "object") {
       const invoice = latestInvoice as any;
       if (invoice.payment_intent && typeof invoice.payment_intent === "object") {
         const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
         clientSecret = paymentIntent.client_secret;
+        paymentIntentId = paymentIntent.id;
+
+        // Update the payment intent with metadata
+        await stripe.paymentIntents.update(paymentIntent.id, {
+          metadata: {
+            userId: user._id.toString(),
+            membershipType,
+            subscriptionId: subscription.id,
+          },
+        });
       }
     }
 
