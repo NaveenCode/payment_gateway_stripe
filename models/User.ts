@@ -13,7 +13,7 @@ export interface ISavedPaymentMethod {
 
 export interface IMembershipDetails {
   customerId?: string;
-  membershipType: "internal" | "external";
+  membershipType?: "internal" | "external";
   price?: number;
   currency?: string;
   lastPaymentDate?: Date;
@@ -23,7 +23,7 @@ export interface IMembershipDetails {
   subscriptionId?: string;
   subscriptionStatus?: "active" | "canceled" | "incomplete" | "past_due" | "trialing" | "unpaid";
   currentPeriodEnd?: Date;
-  hasMembership: boolean;
+  hasMembership?: boolean;
 }
 
 export interface IUser {
@@ -80,7 +80,6 @@ const MembershipDetailsSchema = new Schema<IMembershipDetails>(
       type: String,
       enum: ["internal", "external"],
       default: "external",
-      required: true,
     },
     price: {
       type: Number,
@@ -112,7 +111,7 @@ const MembershipDetailsSchema = new Schema<IMembershipDetails>(
     },
     subscriptionStatus: {
       type: String,
-      enum: ["active", "canceled", "incomplete", "past_due", "trialing", "unpaid"],
+      enum: ["active", "canceled", "incomplete", "past_due", "trialing", "unpaid", null],
       default: null,
     },
     currentPeriodEnd: {
